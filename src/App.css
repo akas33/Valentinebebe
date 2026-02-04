@@ -1,14 +1,12 @@
-/* Importing the Lobster font so it actually works */
 @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
 
 * {
   font-family: "Lobster", cursive;
   font-weight: bold;
   text-align: center;
-  box-sizing: border-box; /* Prevents layout issues */
+  box-sizing: border-box;
 }
 
-/* Background for the whole screen */
 .App {
   background-color: #fff0f3;
   min-height: 100vh;
@@ -18,34 +16,48 @@
   padding: 15px;
 }
 
-/* Container card that holds the content */
 .App-body {
   background: white;
   padding: 30px 20px;
   border-radius: 30px;
   box-shadow: 0 10px 30px rgba(255, 77, 109, 0.2);
   width: 100%;
-  max-width: 450px; /* Looks great on desktop, fits on mobile */
+  max-width: 450px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+}
+
+/* The Polaroid Photo Style */
+.App-photo {
+  width: 100%;
+  max-width: 280px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 10px solid white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  transform: rotate(-2deg); /* Makes it look like a real photo dropped on a table */
 }
 
 .App-text {
-  font-size: 26px; /* Fixed size for better control */
-  font-weight: bold;
+  font-size: 26px;
   margin: 20px 0;
   color: #4a4a4a;
 }
 
-/* Hover effect for the sentence */
-.App-text:hover {
-  color: #ff4d6d;
+.bebe-tag {
+  background: #ff4d6d;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
 }
 
-/* GIFs now resize for smaller phones */
 .App-gif {
   width: 100%;
   max-width: 250px;
@@ -53,7 +65,6 @@
   border-radius: 20px;
 }
 
-/* Buttons Styling */
 .App-button {
   margin: 10px;
   padding: 12px 25px;
@@ -62,61 +73,37 @@
   background-color: #ff4d4d;
   color: white;
   border: none;
-  border-radius: 50px; /* Rounder, modern look */
+  border-radius: 50px;
   transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.App-button:before {
-  content: "\1F498";
-  margin-right: 8px;
+  box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
 }
 
 .App-button:hover {
   background-color: #e60000;
-  transform: translateY(-2px); /* Slight lift on hover */
+  transform: scale(1.05);
 }
 
-/* No Button styling (Reddish Gray) */
-.App-button:nth-child(2) {
-  background-color: #8c8c8c;
+/* Days Counter Box */
+.days-counter {
+  background: #fff0f3;
+  padding: 15px;
+  border-radius: 20px;
+  margin: 15px 0;
+  border: 2px dashed #ff4d6d;
 }
 
-.App-button:nth-child(2):before {
-  content: "\1F494";
+.days-count-number {
+  font-size: 35px;
+  color: #ff4d6d;
+  display: block;
 }
 
-.App-button:nth-child(2):hover {
-  background-color: #404040;
+.pulse {
+  animation: pulse-animation 2s infinite;
 }
 
-/* Success Screen Text */
-.App-text-success {
-  font-size: 20px;
-  line-height: 1.6;
-  margin: 10px 0;
-}
-
-.App-text-success:before {
-  content: "\1F496";
-  margin-right: 8px;
-}
-
-.App-text-date {
-  font-size: 18px;
-  margin-top: 20px;
-  opacity: 0.8;
-}
-
-.App-text-date:before {
-  content: "\1F495";
-  margin-right: 8px;
-}
-
-.App-success {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+@keyframes pulse-animation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
