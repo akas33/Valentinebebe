@@ -21,28 +21,25 @@ const App = () => {
 
   const handleOpenMessage = () => {
     setOpened(true);
+    // Explicitly play music on click
     if (iframeRef.current) {
-      iframeRef.current.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      const url = iframeRef.current.src;
+      iframeRef.current.src = url.replace("autoplay=0", "autoplay=1");
     }
   };
 
   const handleAccept = () => {
     setAccepted(true);
     if (window.confetti) {
-      window.confetti({ 
-        particleCount: 150, 
-        spread: 70, 
-        origin: { y: 0.6 },
-        colors: ['#ff4d6d', '#ffffff', '#ffccd5']
-      });
+      window.confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     }
   };
 
   const handleReject = () => {
     setNoCount(noCount + 1);
-    setYesButtonSize(yesButtonSize + 0.45);
-    const randomX = Math.floor(Math.random() * 260) - 130;
-    const randomY = Math.floor(Math.random() * 260) - 130;
+    setYesButtonSize(yesButtonSize + 0.4);
+    const randomX = Math.floor(Math.random() * 200) - 100;
+    const randomY = Math.floor(Math.random() * 200) - 100;
     setNoButtonPos({ x: randomX, y: randomY });
   };
 
@@ -59,8 +56,14 @@ const App = () => {
   if (!opened) {
     return (
       <div className="App">
-        {/* Preloaded Hidden Player */}
-        <iframe ref={iframeRef} width="0" height="0" src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=24&loop=1&playlist=LPeZOE8ZIHI" allow="autoplay" style={{ display: 'none' }}></iframe>
+        {/* Hidden Player with Autoplay parameter ready */}
+        <iframe 
+          ref={iframeRef} 
+          width="0" height="0" 
+          src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=33&loop=1&playlist=LPeZOE8ZIHI" 
+          allow="autoplay" 
+          style={{ display: 'none' }}>
+        </iframe>
         
         <div className="App-body pulse">
           <div className="bebe-tag">Established 2021</div>
@@ -85,7 +88,11 @@ const App = () => {
                 className="App-button btn-no" 
                 onClick={handleReject} 
                 onMouseEnter={handleReject}
-                style={{ transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, position: 'relative' }}
+                style={{ 
+                    transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, 
+                    position: 'relative',
+                    zIndex: 999 // ALWAYS ON TOP
+                }}
               >
                 {rejectionTexts[Math.min(noCount, rejectionTexts.length - 1)]}
               </button>
