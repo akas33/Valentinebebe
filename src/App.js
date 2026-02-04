@@ -1,83 +1,100 @@
 import React, { useState, useRef } from "react";
 import "./App.css";
 import Success from "./components/Success";
-import Asking from "./components/Asking";
+
+// GIF/Photo Imports
 import flowerBear from "./flowerBear.gif";
+import cryingBear from "./crying.gif";
+import beggingBear from "./begging.gif";
+import heartBear from "./heart.gif"; 
 import madBear from "./madBear.gif";
+import pointBear from "./point.gif"; 
 import ourPhoto from "./our-photo.jpg"; 
 
 const App = () => {
   const [opened, setOpened] = useState(false);
   const [accepted, setAccepted] = useState(false);
-  const [rejected, setRejected] = useState(false);
-  const [noButtonText, setNoButtonText] = useState("No");
+  const [noCount, setNoCount] = useState(0); 
   const [yesButtonSize, setYesButtonSize] = useState(1);
-  
+  const [noButtonPos, setNoButtonPos] = useState({ x: 0, y: 0 });
   const iframeRef = useRef(null);
 
   const handleOpenMessage = () => {
     setOpened(true);
-    // This sends a command to the hidden YouTube player to play immediately
     if (iframeRef.current) {
       iframeRef.current.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
     }
   };
 
-  const handleAccept = () => setAccepted(true);
+  const handleAccept = () => {
+    setAccepted(true);
+    if (window.confetti) {
+      window.confetti({ 
+        particleCount: 150, 
+        spread: 70, 
+        origin: { y: 0.6 },
+        colors: ['#ff4d6d', '#ffffff', '#ffccd5']
+      });
+    }
+  };
 
   const handleReject = () => {
-    setRejected(true);
-    setYesButtonSize(yesButtonSize + 0.4);
-    const rejectionTexts = [
-      "Are you sure, Bebe? 🥺",
-      "But it's been since 2021! 😲",
-      "Don't do this to me, Bro... 💔",
-      "Think of the memories! ✨",
-      "Bebe, please?? ⭐",
-      "Wrong button, try the green one! 😂",
-      "I'm gonna tell your mom! 🏃‍♂️",
-    ];
-    setNoButtonText(rejectionTexts[Math.floor(Math.random() * rejectionTexts.length)]);
+    setNoCount(noCount + 1);
+    setYesButtonSize(yesButtonSize + 0.45);
+    const randomX = Math.floor(Math.random() * 260) - 130;
+    const randomY = Math.floor(Math.random() * 260) - 130;
+    setNoButtonPos({ x: randomX, y: randomY });
   };
+
+  const rejectionGifs = [flowerBear, cryingBear, beggingBear, madBear, heartBear, pointBear];
+  const rejectionTexts = [
+    "No", 
+    "Are you sure, Bebe? 🥺", 
+    "But it's been since 2021! 😲", 
+    "I'm telling your mom! 🏃‍♂️", 
+    "Don't do this to me, Bro... 💔", 
+    "Wrong button, click green! 👉"
+  ];
+
+  if (!opened) {
+    return (
+      <div className="App">
+        {/* Preloaded Hidden Player */}
+        <iframe ref={iframeRef} width="0" height="0" src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=24&loop=1&playlist=LPeZOE8ZIHI" allow="autoplay" style={{ display: 'none' }}></iframe>
+        
+        <div className="App-body pulse">
+          <div className="bebe-tag">Established 2021</div>
+          <img src={ourPhoto} alt="Us" className="App-photo" />
+          <h1 className="App-text">I've been keeping a secret since 2021...</h1>
+          <button className="App-button btn-yes" onClick={handleOpenMessage}>Open the Letter ❤️</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="App">
-      {/* HIDDEN PLAYER: Loaded immediately, but silent until click */}
-      <iframe
-        ref={iframeRef}
-        width="0" height="0"
-        src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=24&loop=1&playlist=LPeZOE8ZIHI"
-        allow="autoplay"
-        style={{ display: 'none' }}
-        title="Music"
-      ></iframe>
-
-      {!opened ? (
-        /* WELCOME SCREEN */
-        <div className="App-body pulse">
-          <div className="bebe-tag">Strictly for Bebe</div>
-          <img src={ourPhoto} alt="Us in 2021" className="App-photo" />
-          <h1 className="App-text">I've been keeping a secret since 2021...</h1>
-          <button className="App-button" onClick={handleOpenMessage}>
-            Open the Letter ❤️
-          </button>
-        </div>
-      ) : (
-        /* PROPOSAL OR SUCCESS SCREEN */
-        <div className="App-body">
-          {!accepted ? (
-            <Asking
-              gif={rejected ? madBear : flowerBear}
-              handleAccept={handleAccept}
-              handleReject={handleReject}
-              noButtonText={noButtonText}
-              yesButtonSize={yesButtonSize}
-            />
-          ) : (
-            <Success />
-          )}
-        </div>
-      )}
+      <div className="App-body">
+        {!accepted ? (
+          <div className="asking-container">
+            <h1 className="App-text">Will you be my Valentine?</h1>
+            <img src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} alt="Bear" className="App-gif" />
+            <div className="button-group">
+              <button className="App-button btn-yes" style={{ transform: `scale(${yesButtonSize})` }} onClick={handleAccept}>Yes</button>
+              <button 
+                className="App-button btn-no" 
+                onClick={handleReject} 
+                onMouseEnter={handleReject}
+                style={{ transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, position: 'relative' }}
+              >
+                {rejectionTexts[Math.min(noCount, rejectionTexts.length - 1)]}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <Success />
+        )}
+      </div>
     </div>
   );
 };
