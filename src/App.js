@@ -63,7 +63,7 @@ const App = () => {
         ref={iframeRef} 
         width="0" 
         height="0" 
-        src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=24&loop=1&playlist=LPeZOE8ZIHI" 
+        src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=34&loop=1&playlist=LPeZOE8ZIHI" 
         allow="autoplay" 
         style={{ display: 'none', position: 'absolute' }}>
       </iframe>
