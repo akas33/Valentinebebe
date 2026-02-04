@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 import Success from "./components/Success";
 
-// GIF/Photo Imports
+// Imports
 import flowerBear from "./flowerBear.gif";
 import cryingBear from "./crying.gif";
 import beggingBear from "./begging.gif";
@@ -19,13 +19,12 @@ const App = () => {
   const [noButtonPos, setNoButtonPos] = useState({ x: 0, y: 0 });
   const iframeRef = useRef(null);
 
-  // THIS IS THE KEY: Play music when she clicks "Open"
   const handleOpenMessage = () => {
     setOpened(true);
+    // Instant Music Play: Send command to YouTube API
     if (iframeRef.current) {
-      // We force the iframe to reload with autoplay=1
-      const currentSrc = iframeRef.current.src;
-      iframeRef.current.src = currentSrc.replace("autoplay=0", "autoplay=1");
+      iframeRef.current.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      iframeRef.current.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
     }
   };
 
@@ -38,72 +37,62 @@ const App = () => {
 
   const handleReject = () => {
     setNoCount(noCount + 1);
-    setYesButtonSize(yesButtonSize + 0.45);
-    const randomX = Math.floor(Math.random() * 260) - 130;
-    const randomY = Math.floor(Math.random() * 260) - 130;
+    setYesButtonSize(prev => prev + 0.35);
+    
+    // Constrain the jump so it stays on screen (Safe Zone)
+    const maxWidth = window.innerWidth > 500 ? 150 : 80; 
+    const randomX = Math.floor(Math.random() * (maxWidth * 2)) - maxWidth;
+    const randomY = Math.floor(Math.random() * 100) - 50; 
     setNoButtonPos({ x: randomX, y: randomY });
   };
 
   const rejectionGifs = [flowerBear, cryingBear, beggingBear, madBear, heartBear, pointBear];
-  const rejectionTexts = [
-    "No", 
-    "Are you sure, Bebe? 🥺", 
-    "But it's been since 2021! 😲", 
-    "I'm telling your mom! 🏃‍♂️", 
-    "Don't do this to me, Bro... 💔", 
-    "Wrong button, click green! 👉"
-  ];
+  const rejectionTexts = ["No", "Are you sure? 🥺", "Since 2021! 😲", "I'm telling mom! 🏃‍♂️", "Don't do this... 💔", "Click Green! 👉"];
 
   return (
     <div className="App">
-      {/* THE PLAYER STAYS HERE ALWAYS 
-         It starts at the Welcome Page and never stops 
-      */}
+      {/* Hidden YouTube Player - Pre-loaded and ready */}
       <iframe 
         ref={iframeRef} 
-        width="0" 
-        height="0" 
-        src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=0&start=34&loop=1&playlist=LPeZOE8ZIHI" 
+        width="0" height="0" 
+        src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=1&mute=1&start=32&loop=1&playlist=LPeZOE8ZIHI" 
         allow="autoplay" 
         style={{ display: 'none', position: 'absolute' }}>
       </iframe>
 
       <div className="App-body">
         {!opened ? (
-          /* WELCOME PAGE */
           <div className="pulse">
             <div className="bebe-tag">Established 2021</div>
             <img src={ourPhoto} alt="Us" className="App-photo" />
             <h1 className="App-text">I've been keeping a secret since 2021...</h1>
-            <button className="App-button btn-yes" onClick={handleOpenMessage}>
-                Open the Letter ❤️
-            </button>
+            <button className="App-button btn-yes" onClick={handleOpenMessage}>Open ❤️</button>
           </div>
         ) : !accepted ? (
-          /* ASKING PAGE */
           <div className="asking-container">
             <h1 className="App-text">Will you be my Valentine?</h1>
-            <img 
-              src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} 
-              alt="Bear" 
-              className="App-gif" 
-            />
+            <img src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} alt="Bear" className="App-gif" />
+            
             <div className="button-group">
-              <button 
-                className="App-button btn-yes" 
-                style={{ transform: `scale(${yesButtonSize})`, position: 'relative', zIndex: 10 }} 
-                onClick={handleAccept}
-              >
-                Yes
-              </button>
+              {/* YES BUTTON: Stays in place, just grows */}
+              <div className="yes-container">
+                <button 
+                  className="App-button btn-yes" 
+                  style={{ transform: `scale(${yesButtonSize})` }} 
+                  onClick={handleAccept}
+                >
+                  Yes
+                </button>
+              </div>
+
+              {/* NO BUTTON: Jumps around but stays on top */}
               <button 
                 className="App-button btn-no" 
                 onClick={handleReject} 
                 onMouseEnter={handleReject}
                 style={{ 
-                    transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, 
-                    position: 'relative',
-                    zIndex: 999 
+                    transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`,
+                    zIndex: 1000 
                 }}
               >
                 {rejectionTexts[Math.min(noCount, rejectionTexts.length - 1)]}
@@ -111,7 +100,6 @@ const App = () => {
             </div>
           </div>
         ) : (
-          /* SUCCESS PAGE */
           <Success />
         )}
       </div>
