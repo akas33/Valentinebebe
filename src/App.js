@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import "./App.css";
 import Success from "./components/Success";
 
-// Imports
+// GIF/Photo Imports
 import flowerBear from "./flowerBear.gif";
 import cryingBear from "./crying.gif";
 import beggingBear from "./begging.gif";
-import heartBear from "./heart.gif"; 
 import madBear from "./madBear.gif";
+import heartBear from "./heart.gif"; 
 import pointBear from "./point.gif"; 
 import ourPhoto from "./our-photo.jpg"; 
 
@@ -21,7 +21,6 @@ const App = () => {
 
   const handleOpenMessage = () => {
     setOpened(true);
-    // Instant Music Play: Send command to YouTube API
     if (iframeRef.current) {
       iframeRef.current.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
       iframeRef.current.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
@@ -31,27 +30,42 @@ const App = () => {
   const handleAccept = () => {
     setAccepted(true);
     if (window.confetti) {
-      window.confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      window.confetti({ 
+        particleCount: 150, 
+        spread: 70, 
+        origin: { y: 0.6 },
+        colors: ['#ff4d6d', '#ffffff', '#ffccd5']
+      });
     }
   };
 
   const handleReject = () => {
     setNoCount(noCount + 1);
-    setYesButtonSize(prev => prev + 0.35);
+    setYesButtonSize(prev => prev + 0.35); // Growth rate
     
-    // Constrain the jump so it stays on screen (Safe Zone)
-    const maxWidth = window.innerWidth > 500 ? 150 : 80; 
+    // Jump logic: Stays within safe bounds of the screen
+    const maxWidth = window.innerWidth > 500 ? 140 : 70; 
     const randomX = Math.floor(Math.random() * (maxWidth * 2)) - maxWidth;
-    const randomY = Math.floor(Math.random() * 100) - 50; 
+    const randomY = Math.floor(Math.random() * 80) - 40; 
     setNoButtonPos({ x: randomX, y: randomY });
   };
 
+  // GIF sequence matching your text
   const rejectionGifs = [flowerBear, cryingBear, beggingBear, madBear, heartBear, pointBear];
-  const rejectionTexts = ["No", "Are you sure? 🥺", "Since 2021! 😲", "I'm telling mom! 🏃‍♂️", "Don't do this... 💔", "Click Green! 👉"];
+  
+  // FINALIZED TEXT ARRAY
+  const rejectionTexts = [
+    "No", 
+    "Are you sure, Bebe? 🥺", 
+    "But it's been since 2021! 😲", 
+    "I'm telling your mom! 🏃‍♂️", 
+    "Don't do this to me 💔", 
+    "Click the green one! 🫠✨"
+  ];
 
   return (
     <div className="App">
-      {/* Hidden YouTube Player - Pre-loaded and ready */}
+      {/* Preloaded Music Player */}
       <iframe 
         ref={iframeRef} 
         width="0" height="0" 
@@ -71,10 +85,13 @@ const App = () => {
         ) : !accepted ? (
           <div className="asking-container">
             <h1 className="App-text">Will you be my Valentine?</h1>
-            <img src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} alt="Bear" className="App-gif" />
+            <img 
+              src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} 
+              alt="Mood Bear" 
+              className="App-gif" 
+            />
             
             <div className="button-group">
-              {/* YES BUTTON: Stays in place, just grows */}
               <div className="yes-container">
                 <button 
                   className="App-button btn-yes" 
@@ -85,7 +102,6 @@ const App = () => {
                 </button>
               </div>
 
-              {/* NO BUTTON: Jumps around but stays on top */}
               <button 
                 className="App-button btn-no" 
                 onClick={handleReject} 
@@ -108,3 +124,4 @@ const App = () => {
 };
 
 export default App;
+
