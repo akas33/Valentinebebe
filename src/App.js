@@ -20,7 +20,7 @@ const App = () => {
   const [timeMarried, setTimeMarried] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
   const iframeRef = useRef(null);
 
-  // Marriage Clock Logic (Dec 11, 2024 @ 9:25 AM)
+  // Marriage Clock Logic (Dec 11, 2024)
   useEffect(() => {
     const marriageDate = new Date("2024-12-11T09:25:00");
     const timer = setInterval(() => {
@@ -42,10 +42,22 @@ const App = () => {
     setOpened(true);
     if (iframeRef.current) {
       iframeRef.current.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      iframeRef.current.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
     }
   };
 
-  const handleAccept = () => setAccepted(true);
+  const handleAccept = () => {
+    setAccepted(true);
+    // RESTORED CONFETTI
+    if (window.confetti) {
+      window.confetti({ 
+        particleCount: 150, 
+        spread: 70, 
+        origin: { y: 0.6 },
+        colors: ['#ff4d6d', '#ffffff', '#ffccd5']
+      });
+    }
+  };
 
   const handleReject = () => {
     setNoCount(noCount + 1);
@@ -57,46 +69,32 @@ const App = () => {
   };
 
   const rejectionGifs = [flowerBear, cryingBear, beggingBear, madBear, heartBear, pointBear];
-  const rejectionTexts = ["No", "Are you sure?", "But we've been married since Dec!", "I'm telling your mom! 🏃‍♂️", "Don't do this to me 💔", "Click the green one! 🫠✨"];
+  const rejectionTexts = ["No", "Are you sure, Sweety? 🥺", "But we've been since 2021! 😲", "I'm telling your mom! 🏃‍♂️", "Don't do this to me 💔", "Click the green one! 🫠✨"];
 
   return (
     <div className="App">
-      <iframe ref={iframeRef} width="0" height="0" src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=1&mute=1&start=30" allow="autoplay" style={{ display: 'none', position: 'absolute' }}></iframe>
+      {/* RESTORED SONG */}
+      <iframe ref={iframeRef} width="0" height="0" src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=1&mute=1&start=30&loop=1&playlist=LPeZOE8ZIHI" allow="autoplay" style={{ display: 'none', position: 'absolute' }}></iframe>
 
       <div className="App-body">
         {!opened ? (
           <div className="pulse">
-            <div className="bebe-tag">Married since 11 Dec 2024</div>
-            
-            {/* Real-time Clock */}
-            <div className="live-clock">
-              <div>{timeMarried.days}d</div>
-              <div>{timeMarried.hours}h</div>
-              <div>{timeMarried.mins}m</div>
-              <div className="secs">{timeMarried.secs}s</div>
-            </div>
-
+            <div className="bebe-tag">Married: {timeMarried.days}d {timeMarried.hours}h {timeMarried.mins}m</div>
             <div className="photo-frame">
-              <img src={ourPhoto} alt="Our First Meeting" className="zoom-animation" />
+              <img src={ourPhoto} alt="Us" className="zoom-animation" />
             </div>
-
-            <h1 className="App-text">The best decision I ever made was "I Do."</h1>
-            <button className="App-button btn-yes" onClick={handleOpenMessage}>Unlock Our Memories ❤️</button>
+            <h1 className="App-text">I've been keeping a secret since 2021...</h1>
+            <button className="App-button btn-yes" onClick={handleOpenMessage}>Open ❤️</button>
           </div>
         ) : !accepted ? (
           <div className="asking-container">
-            <h1 className="App-text">Will you still be my Valentine, Babu?</h1>
+            <h1 className="App-text">Will you still be my Valentine, Sweety?</h1>
             <img src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} alt="Mood" className="App-gif" />
-            
             <div className="button-group">
               <div className="yes-container">
                 <button className="App-button btn-yes" style={{ transform: `scale(${yesButtonSize})` }} onClick={handleAccept}>Yes</button>
               </div>
-              <button 
-                className="App-button btn-no" 
-                onClick={handleReject} 
-                style={{ transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, zIndex: 1000 }}
-              >
+              <button className="App-button btn-no" onClick={handleReject} onMouseEnter={handleReject} style={{ transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, zIndex: 1000 }}>
                 {rejectionTexts[Math.min(noCount, rejectionTexts.length - 1)]}
               </button>
             </div>
@@ -110,4 +108,5 @@ const App = () => {
 };
 
 export default App;
+
           
