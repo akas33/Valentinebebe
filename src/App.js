@@ -17,19 +17,19 @@ const App = () => {
   const [noCount, setNoCount] = useState(0); 
   const [yesButtonSize, setYesButtonSize] = useState(1);
   const [noButtonPos, setNoButtonPos] = useState({ x: 0, y: 0 });
-  const [timeMarried, setTimeMarried] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
+  const [timeMarried, setTimeMarried] = useState({ totalHours: 0, mins: 0, secs: 0 });
   const iframeRef = useRef(null);
 
-  // Marriage Clock Logic (Dec 11, 2024)
+  // Updated Marriage Clock: Hours, Minutes, Seconds (From Dec 11, 2024 @ 9:25 AM)
   useEffect(() => {
     const marriageDate = new Date("2024-12-11T09:25:00");
     const timer = setInterval(() => {
       const now = new Date();
       const diff = now - marriageDate;
+
       if (diff > 0) {
         setTimeMarried({
-          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+          totalHours: Math.floor(diff / (1000 * 60 * 60)), // Calculated as total hours
           mins: Math.floor((diff / 1000 / 60) % 60),
           secs: Math.floor((diff / 1000) % 60),
         });
@@ -48,7 +48,6 @@ const App = () => {
 
   const handleAccept = () => {
     setAccepted(true);
-    // RESTORED CONFETTI
     if (window.confetti) {
       window.confetti({ 
         particleCount: 150, 
@@ -73,16 +72,20 @@ const App = () => {
 
   return (
     <div className="App">
-      {/* RESTORED SONG */}
       <iframe ref={iframeRef} width="0" height="0" src="https://www.youtube.com/embed/LPeZOE8ZIHI?enablejsapi=1&autoplay=1&mute=1&start=30&loop=1&playlist=LPeZOE8ZIHI" allow="autoplay" style={{ display: 'none', position: 'absolute' }}></iframe>
 
       <div className="App-body">
         {!opened ? (
           <div className="pulse">
-            <div className="bebe-tag">Married: {timeMarried.days}d {timeMarried.hours}h {timeMarried.mins}m</div>
+            {/* Clock in the tag now shows Hours, Minutes, Seconds */}
+            <div className="bebe-tag">
+              Married: {timeMarried.totalHours}h {timeMarried.mins}m {timeMarried.secs}s
+            </div>
+            
             <div className="photo-frame">
               <img src={ourPhoto} alt="Us" className="zoom-animation" />
             </div>
+            
             <h1 className="App-text">I've been keeping a secret since 2021...</h1>
             <button className="App-button btn-yes" onClick={handleOpenMessage}>Open ❤️</button>
           </div>
@@ -90,11 +93,17 @@ const App = () => {
           <div className="asking-container">
             <h1 className="App-text">Will you still be my Valentine, Sweety?</h1>
             <img src={rejectionGifs[Math.min(noCount, rejectionGifs.length - 1)]} alt="Mood" className="App-gif" />
+            
             <div className="button-group">
               <div className="yes-container">
                 <button className="App-button btn-yes" style={{ transform: `scale(${yesButtonSize})` }} onClick={handleAccept}>Yes</button>
               </div>
-              <button className="App-button btn-no" onClick={handleReject} onMouseEnter={handleReject} style={{ transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, zIndex: 1000 }}>
+              <button 
+                className="App-button btn-no" 
+                onClick={handleReject} 
+                onMouseEnter={handleReject}
+                style={{ transform: `translate(${noButtonPos.x}px, ${noButtonPos.y}px)`, zIndex: 1000 }}
+              >
                 {rejectionTexts[Math.min(noCount, rejectionTexts.length - 1)]}
               </button>
             </div>
@@ -108,5 +117,3 @@ const App = () => {
 };
 
 export default App;
-
-          
